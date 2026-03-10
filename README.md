@@ -79,7 +79,7 @@ Remove-Item rustdex.zip
 
 **Verify installation:**
 ```bash
-rustdex --version
+rustdex --help
 ```
 
 > **Don't see your platform?** Build from source: https://github.com/burggraf/rustdex#installation
