@@ -1,0 +1,42 @@
+{
+  "name": "pi-rustdex",
+  "version": "0.1.0",
+  "description": "Pi extension for RustDex - universal code indexer and semantic search",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burggraf/pi-rustdex.git"
+  },
+  "author": "Mark Burggraf",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "rustdex",
+    "code-indexer",
+    "semantic-search",
+    "symbol-search"
+  ],
+  "scripts": {
+    "test": "vitest run"
+  },
+  "main": "extensions/index.ts",
+  "files": [
+    "extensions",
+    "src",
+    "package.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
+  },
+  "pi": {
+    "extensions": [
+      "extensions/index.ts"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
