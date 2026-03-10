@@ -2,6 +2,10 @@
 
 A Pi extension that integrates [RustDex](https://github.com/burggraf/rustdex) - a high-performance, universal code indexer and semantic search tool - directly into your Pi agent workflow.
 
+**What does this do?** RustDex creates a searchable index of your codebase, allowing Pi to find functions, classes, and API endpoints using plain English queries like *"show me where we handle user authentication"* instead of guessing file names.
+
+---
+
 ## Features
 
 - **🚀 Index Codebases**: Create searchable indexes of your projects with a single command
@@ -11,23 +15,56 @@ A Pi extension that integrates [RustDex](https://github.com/burggraf/rustdex) - 
 - **📁 Repository Management**: List and manage all your indexed repositories
 - **📖 Symbol Reading**: Read exact symbol source code using byte ranges (token-efficient)
 
-## Prerequisites
+---
 
-Before using this extension, you need to install RustDex:
+## Getting Started (Step by Step)
 
+### What You Need
+
+Pi-RustDex requires **two** components:
+
+1. **The RustDex binary** - The Rust-based indexer that runs on your machine
+2. **This Pi extension** - The bridge that lets Pi talk to RustDex
+
+---
+
+### Step 1: Install the RustDex Binary
+
+Download a pre-built binary from the [RustDex Releases](https://github.com/burggraf/rustdex/releases) page:
+
+**macOS (Apple Silicon):**
 ```bash
-# Clone and build from source
-git clone https://github.com/burggraf/rustdex.git
-cd rustdex
-cargo build --release
-
-# Move to PATH
-cp target/release/rustdex /usr/local/bin/
+curl -L -o rustdex https://github.com/burggraf/rustdex/releases/latest/download/rustdex-darwin-arm64
+chmod +x rustdex
+sudo mv rustdex /usr/local/bin/
 ```
 
-## Installation
+**macOS (Intel):**
+```bash
+curl -L -o rustdex https://github.com/burggraf/rustdex/releases/latest/download/rustdex-darwin-amd64
+chmod +x rustdex
+sudo mv rustdex /usr/local/bin/
+```
 
-Install the extension using Pi's package manager:
+**Linux (x86_64):**
+```bash
+curl -L -o rustdex https://github.com/burggraf/rustdex/releases/latest/download/rustdex-linux-amd64
+chmod +x rustdex
+sudo mv rustdex /usr/local/bin/
+```
+
+**Verify installation:**
+```bash
+rustdex --version
+```
+
+> **Don't see your platform?** Build from source: https://github.com/burggraf/rustdex#installation
+
+---
+
+### Step 2: Install the Pi Extension
+
+Inside any Pi session, run:
 
 ```bash
 pi install npm:pi-rustdex
@@ -41,138 +78,291 @@ Or add to your project's `pi.json`:
 }
 ```
 
-## Available Tools
+**Verify the extension is loaded:**
 
-### `rustdex_index`
-Index a codebase for searching.
-
-**Parameters:**
-- `project_path` (string, required): Absolute path to the project directory
-- `name` (string, optional): Name for the index (defaults to folder name)
-
-**Example:**
-```typescript
-{
-  "project_path": "/home/user/my-project",
-  "name": "my-project"
-}
+Type this in Pi:
+```
+/rustdex-status
 ```
 
-### `rustdex_search`
-Search for symbols by exact name.
+You should see: "RustDex is installed" ✅
 
-**Parameters:**
-- `query` (string, required): Symbol name to search for
-- `repo` (string, required): Repository name from rustdex_index
+---
 
-**Example:**
-```typescript
-{
-  "query": "validate_user",
-  "repo": "my-project"
-}
+### Step 3: Index Your First Project
+
+Now let's index a codebase so Pi can search it. You can index any project on your machine.
+
+**Example: Indexing a React project**
+
+Type in Pi:
+```
+Please index my project at /Users/me/my-react-app with the name "myapp"
 ```
 
-### `rustdex_semantic`
-Search code by natural language description.
+Pi will respond with something like:
+> Successfully indexed /Users/me/my-react-app. The index "myapp" is now ready for searching.
 
-**Parameters:**
-- `query` (string, required): Natural language query
-- `repo` (string, required): Repository name
-- `limit` (number, optional): Maximum results (default: 10)
+**What just happened?**
+- RustDex scanned all your source files
+- Created a local database at `~/.rustdex/myapp.db`
+- Generated vector embeddings for semantic search
+- Registered the project in `~/.rustdex/registry.db`
 
-**Example:**
-```typescript
-{
-  "query": "how do we handle password hashing",
-  "repo": "my-project",
-  "limit": 5
-}
+**Index multiple projects:**
+```
+Index /Users/me/work/api-server as "api"
+Index /Users/me/personal/blog as "blog"
 ```
 
-### `rustdex_routes`
-Extract HTTP routes from web frameworks.
+---
 
-**Parameters:**
-- `repo` (string, required): Repository name
-- `method` (string, optional): Filter by HTTP method (GET, POST, PUT, DELETE, etc.)
+### Step 4: Search Your Code with Natural Language
 
-**Example:**
-```typescript
-{
-  "repo": "my-project",
-  "method": "POST"
-}
+Now the fun part! You can ask Pi to find code using plain English.
+
+#### Example 1: Finding Authentication Code
+
+**You type:**
+```
+Search myapp for "how do we handle user login"
 ```
 
-### `rustdex_list_repos`
-List all indexed repositories.
+**Pi might respond:**
+> Found 5 results for "how do we handle user login" in myapp:
+> 
+> 1. **authenticateUser** (function) - Score: 94.2%
+>    File: /Users/me/my-react-app/src/auth.js:45
+>    Byte range: 1234-1890
+> 
+> 2. **LoginForm** (class) - Score: 87.5%
+>    File: /Users/me/my-react-app/src/components/LoginForm.jsx:12
+>    Byte range: 456-1200
+> 
+> ...
 
-**Parameters:** None
-
-### `rustdex_read_symbol`
-Read the source code of a symbol using its byte range (from search results).
-
-**Parameters:**
-- `file` (string, required): Absolute path to the source file
-- `start_byte` (number, required): Start byte offset
-- `end_byte` (number, required): End byte offset
-
-**Example:**
-```typescript
-{
-  "file": "/home/user/my-project/src/auth.ts",
-  "start_byte": 1234,
-  "end_byte": 1567
-}
+**You follow up:**
+```
+Show me the source code for authenticateUser
 ```
 
-## Available Commands
+**Pi responds with the actual code:**
+> ```javascript
+> async function authenticateUser(email, password) {
+>   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+>   const user = await db.users.findOne({ email, password: hashed });
+>   if (!user) throw new Error('Invalid credentials');
+>   return generateToken(user);
+> }
+> ```
 
-### `/rustdex-status`
-Check if RustDex is installed and available.
+#### Example 2: Finding API Endpoints
 
-## Usage Examples
-
-### Index a Project
+**You type:**
 ```
-Please index my project at /home/user/webapp
-```
-
-### Search for a Function
-```
-Find the validateToken function in webapp
-```
-
-### Semantic Search
-```
-Search for "user authentication logic" in webapp
+Show me all the POST routes in myapp
 ```
 
-### Read Symbol Source
+**Pi responds:**
+> Found 3 POST routes in myapp:
+> 
+> **/Users/me/my-react-app/src/api.js**:
+>   POST /api/users (line 23)
+>   POST /api/login (line 45)
+>   POST /api/posts (line 67)
+
+#### Example 3: Semantic Search
+
+**You type:**
 ```
-Show me the source code of the validateToken function from the last search result
+Search myapp for "password reset email functionality"
 ```
+
+**Pi finds relevant code even if function names don't match:**
+> Found 4 results for "password reset email functionality" in myapp:
+> 
+> 1. **sendResetEmail** (function) - Score: 96.8%
+>    File: /Users/me/my-react-app/src/email.js:89
+> 
+> 2. **generateResetToken** (function) - Score: 91.2%
+>    File: /Users/me/my-react-app/src/auth.js:156
+>
+> 3. **ResetPasswordPage** (component) - Score: 88.4%
+>    File: /Users/me/my-react-app/src/pages/ResetPassword.jsx:14
+
+#### Example 4: Exact Symbol Search
+
+**You type:**
+```
+Find the function called validateToken in myapp
+```
+
+**Pi responds:**
+> Found 2 symbol(s) matching "validateToken" in myapp:
+> 
+> 1. **validateToken** (function)
+>    File: /Users/me/my-react-app/src/auth.js:45
+>    Byte range: 1234-1567
+>
+> 2. **validateToken** (function)
+>    File: /Users/me/my-react-app/src/middleware/jwt.js:12
+>    Byte range: 890-1100
+
+---
+
+### Step 5: Managing Your Indexes
+
+**List all indexed projects:**
+```
+What repos do I have indexed?
+```
+
+**Pi responds:**
+> 3 indexed repositories:
+> 
+> 1. **myapp**
+>    Path: /Users/me/my-react-app
+>    Indexed: 2024-03-10T14:30:00
+>
+> 2. **api**
+>    Path: /Users/me/work/api-server
+>    Indexed: 2024-03-09T10:15:00
+>
+> 3. **blog**
+>    Path: /Users/me/personal/blog
+>    Indexed: 2024-03-08T16:45:00
+```
+
+---
+
+## Quick Reference
+
+### Available Tools
+
+| Tool | What it does | Example query |
+|------|-------------|---------------|
+| `rustdex_index` | Index a codebase | *"Index /path/to/project as 'myproject'"* |
+| `rustdex_search` | Find symbols by exact name | *"Find the function validateUser in myproject"* |
+| `rustdex_semantic` | Natural language search | *"Search myproject for 'how we handle errors'"* |
+| `rustdex_routes` | Find HTTP routes | *"Show me all API routes in myproject"* |
+| `rustdex_list_repos` | List indexed projects | *"What repos do I have indexed?"* |
+| `rustdex_read_symbol` | Read source code | *"Show me the source for validateUser"* |
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/rustdex-status` | Check if RustDex is installed |
+
+---
+
+## Example Conversation Flows
+
+### Flow 1: Exploring a New Codebase
+
+**You:** Index /Users/me/work/legacy-api as "legacy"
+
+**Pi:** ✅ Successfully indexed legacy-api.
+
+**You:** Show me all the POST routes in legacy
+
+**Pi:** [Lists 12 POST routes across various files]
+
+**You:** Search legacy for "user authentication middleware"
+
+**Pi:** [Finds authMiddleware function with 92% relevance]
+
+**You:** Show me the source code for authMiddleware
+
+**Pi:** [Displays the full function source]
+
+### Flow 2: Finding and Fixing a Bug
+
+**You:** Search blog for "image upload handling"
+
+**Pi:** [Found processImageUpload function]
+
+**You:** Show me the source
+
+**Pi:** [Displays code showing the bug]
+
+**You:** [Edit the file to fix the bug]
+
+### Flow 3: Understanding Code Structure
+
+**You:** What repos do I have indexed?
+
+**Pi:** [Lists 5 projects]
+
+**You:** Search api for "database connection pooling"
+
+**Pi:** [Finds connection pool configuration]
+
+**You:** Search api for "all exported functions in the db module"
+
+**Pi:** [Lists relevant functions]
+
+---
 
 ## Supported Languages
 
-RustDex supports a wide range of programming languages:
+RustDex can index and search:
 - **Rust**, **Python**, **JavaScript**, **TypeScript (TSX)**
 - **Go**, **Java**, **PHP**, **C**, **C++**
 - **Elixir**, **Ruby**, **Vue**
 
+---
+
 ## Storage Location
 
-All data is stored in `~/.rustdex/`:
-- `registry.db`: Tracks all projects and their paths
-- `<repo_name>.db`: Contains the actual index for each project
+All data is stored locally in `~/.rustdex/`:
+- `registry.db` - Tracks all projects and their paths
+- `<repo_name>.db` - Index and embeddings for each project
+
+**No data leaves your machine. Everything is 100% local.**
+
+---
+
+## Troubleshooting
+
+### "RustDex not found" error
+
+Make sure the `rustdex` binary is in your PATH:
+```bash
+which rustdex
+# Should output: /usr/local/bin/rustdex
+
+# If not found, reinstall:
+sudo mv rustdex /usr/local/bin/
+```
+
+### Extension not loading
+
+Check if the extension is installed:
+```bash
+pi list-extensions
+```
+
+If not listed, reinstall:
+```bash
+pi install npm:pi-rustdex
+```
+
+### Indexing takes a long time
+
+Large codebases may take several minutes to index. This is normal - RustDex is analyzing every file and generating ML embeddings locally.
+
+---
 
 ## Why Use RustDex with Pi?
 
-- **100% Local**: All embeddings and indexes run locally - no API keys required
-- **Token Efficient**: Instead of reading entire files, get exact byte ranges for symbols
-- **Fast**: High-performance Rust implementation with Tree-sitter parsing
-- **Semantic Understanding**: Find code by what it does, not just what it's called
+- **🤔 Don't remember file names?** Search by *what the code does*
+- **📚 Large codebase?** Find relevant code in seconds, not minutes
+- **🎯 Token Efficient** - Pi reads only the relevant bytes, not entire files
+- **🔒 100% Private** - No code leaves your machine, no API keys needed
+- **⚡ Fast** - High-performance Rust implementation with Tree-sitter parsing
+
+---
 
 ## License
 
