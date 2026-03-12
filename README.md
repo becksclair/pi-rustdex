@@ -31,11 +31,35 @@ Pi-RustDex requires **two** components:
 
 ### Step 1: Install the RustDex Binary
 
-Download a pre-built binary from the [RustDex Releases](https://github.com/burggraf/rustdex/releases) page. The latest release (v0.2.0) includes the following binaries:
+**Recommended: Install via npm (automatic)**
+
+The easiest way to install RustDex is via npm. When you install this Pi extension, RustDex will be automatically installed for you:
+
+```bash
+# Install this extension - RustDex will be installed automatically
+pi install npm:pi-rustdex
+```
+
+**Or install RustDex manually via npm:**
+
+```bash
+npm install -g rustdex
+```
+
+The npm package automatically detects your platform and downloads the appropriate binary:
+- macOS (ARM64/x64)
+- Linux (ARM64/AMD64)
+- Windows (ARM64/AMD64)
+
+---
+
+**Manual Installation (alternative)**
+
+If you prefer to install RustDex manually, download a pre-built binary from the [RustDex Releases](https://github.com/burggraf/rustdex/releases) page. The latest release (v0.4.1) includes binaries for all platforms.
 
 **macOS (Apple Silicon):**
 ```bash
-curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.2.0/rustdex-v0.2.0-darwin-arm64.zip
+curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.4.1/rustdex-v0.4.1-darwin-arm64.zip
 unzip rustdex.zip
 chmod +x rustdex
 sudo mv rustdex /usr/local/bin/
@@ -44,16 +68,7 @@ rm rustdex.zip
 
 **Linux (x86_64):**
 ```bash
-curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.2.0/rustdex-v0.2.0-linux-amd64.zip
-unzip rustdex.zip
-chmod +x rustdex
-sudo mv rustdex /usr/local/bin/
-rm rustdex.zip
-```
-
-**Linux (ARM64):**
-```bash
-curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.2.0/rustdex-v0.2.0-linux-arm64.zip
+curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.4.1/rustdex-v0.4.1-linux-amd64.zip
 unzip rustdex.zip
 chmod +x rustdex
 sudo mv rustdex /usr/local/bin/
@@ -62,17 +77,7 @@ rm rustdex.zip
 
 **Windows (x86_64):**
 ```powershell
-# Download and extract
-curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.2.0/rustdex-v0.2.0-windows-amd64.zip
-Expand-Archive -Path rustdex.zip -DestinationPath .
-# Move to a directory in your PATH (e.g., C:\Windows\System32 or a custom location)
-Move-Item -Path .\rustdex.exe -Destination C:\Windows\System32\
-Remove-Item rustdex.zip
-```
-
-**Windows (ARM64):**
-```powershell
-curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.2.0/rustdex-v0.2.0-windows-arm64.zip
+curl -L -o rustdex.zip https://github.com/burggraf/rustdex/releases/download/v0.4.1/rustdex-v0.4.1-windows-amd64.zip
 Expand-Archive -Path rustdex.zip -DestinationPath .
 Move-Item -Path .\rustdex.exe -Destination C:\Windows\System32\
 Remove-Item rustdex.zip
@@ -81,7 +86,7 @@ Remove-Item rustdex.zip
 **Verify installation:**
 ```bash
 rustdex --version
-# Should output: rustdex 0.2.0
+# Should output: rustdex 0.4.1
 
 rustdex --help
 ```

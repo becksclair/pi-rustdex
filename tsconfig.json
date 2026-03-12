@@ -11,6 +11,6 @@
     "outDir": "./dist",
     "rootDir": "."
   },
-  "include": ["extensions/**/*", "src/**/*"],
+  "include": ["extensions/**/*", "src/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist"]
 }

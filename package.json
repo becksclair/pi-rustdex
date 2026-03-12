@@ -1,6 +1,6 @@
 {
   "name": "pi-rustdex",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "description": "Pi extension for RustDex - universal code indexer and semantic search",
   "repository": {
     "type": "git",
@@ -16,14 +16,17 @@
     "symbol-search"
   ],
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "node scripts/postinstall.js"
   },
   "main": "extensions/index.ts",
   "files": [
     "extensions",
     "src",
+    "scripts",
     "package.json",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "peerDependencies": {
     "@mariozechner/pi-coding-agent": "*",
