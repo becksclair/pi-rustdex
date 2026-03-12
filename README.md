@@ -4,6 +4,8 @@ A Pi extension that integrates [RustDex](https://github.com/burggraf/rustdex) - 
 
 **What does this do?** RustDex creates a searchable index of your codebase, allowing Pi to find functions, classes, and API endpoints using plain English queries like *"show me where we handle user authentication"* instead of guessing file names.
 
+> **Acknowledgment**: RustDex is a complete re-implementation in Rust based on the excellent concepts from [SymDex](https://github.com/husnainpk/SymDex) by Husnain. The original SymDex project pioneered the idea of universal code indexing with semantic search, and RustDex builds on those foundations with improved performance and cross-platform support.
+
 ---
 
 ## Features
