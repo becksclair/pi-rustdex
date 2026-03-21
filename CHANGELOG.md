@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.3 - 2026-03-21
+
+### Changed
+- Version synced with rustdex v0.4.3
+- Postinstall now updates rustdex to latest version (previously only installed if missing)
+- Users with older rustdex will be auto-upgraded when they reinstall pi-rustdex
+
+### Note
+- RustDex 0.4.3 adds `.rustdexignore` support, `--ignore` CLI flag, and automatic `.gitignore` integration
+
 ## 0.4.1 - 2026-03-12
 
 ### Added
