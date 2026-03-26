@@ -105,8 +105,6 @@ const STATUS_KEY = "pi-rustdex";
 const READY_FLASH_MS = 1000;
 const INDEXED_SYMBOL = "⛁";
 const WATCHING_SYMBOL = "◉";
-const STATUS_SEPARATOR = " · ";
-
 type StatusTone = "success" | "warning";
 
 export default function (pi: ExtensionAPI) {
@@ -125,7 +123,7 @@ export default function (pi: ExtensionAPI) {
     const { theme } = ctx.ui;
     ctx.ui.setStatus(
       STATUS_KEY,
-      `${theme.fg(indexTone, INDEXED_SYMBOL)}${STATUS_SEPARATOR}${theme.fg(watchTone, WATCHING_SYMBOL)}`
+      `${theme.fg(indexTone, INDEXED_SYMBOL)} ${theme.fg(watchTone, WATCHING_SYMBOL)}`
     );
   }
 
@@ -137,7 +135,7 @@ export default function (pi: ExtensionAPI) {
     const { theme } = ctx.ui;
     ctx.ui.setStatus(
       STATUS_KEY,
-      `${orange(INDEXED_SYMBOL)}${STATUS_SEPARATOR}${theme.fg("warning", WATCHING_SYMBOL)}`
+      `${orange(INDEXED_SYMBOL)} ${theme.fg("warning", WATCHING_SYMBOL)}`
     );
   }
 
