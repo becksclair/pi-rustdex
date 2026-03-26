@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Added `promptSnippet` metadata to every RustDex tool so Pi includes them in the default `Available tools` prompt section
+- Added stronger `promptGuidelines` to steer the model toward the intended RustDex workflow: list repos, index if needed, search appropriately, then read exact symbols
+- Rewrote the README and API reference to document the tools as default-use agent primitives instead of bare parameter listings
+
 ## 0.4.3 - 2026-03-21
 
 ### Changed
