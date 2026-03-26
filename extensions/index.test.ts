@@ -1,5 +1,7 @@
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it } from "vitest";
-import extension from "./index";
+import extension, { shouldAutoIndexProject } from "./index";
 
 type RegisteredTool = {
   name: string;
@@ -67,5 +69,28 @@ describe("pi-rustdex tool prompt metadata", () => {
     expect(byName.get("rustdex_semantic")?.promptGuidelines).toContain(
       "After rustdex_semantic returns promising hits, use rustdex_read_symbol to inspect the exact source for the best matches."
     );
+  });
+});
+
+describe("shouldAutoIndexProject", () => {
+  it("blocks obvious protected home directories", () => {
+    expect(shouldAutoIndexProject(os.homedir())).toMatchObject({ allowed: false });
+    expect(shouldAutoIndexProject(path.join(os.homedir(), ".config"))).toMatchObject({
+      allowed: false,
+    });
+    expect(shouldAutoIndexProject(path.join(os.homedir(), ".cache"))).toMatchObject({
+      allowed: false,
+    });
+    expect(shouldAutoIndexProject(path.join(os.homedir(), ".local"))).toMatchObject({
+      allowed: false,
+    });
+  });
+
+  it("allows this repository because it is a git worktree", () => {
+    expect(shouldAutoIndexProject(process.cwd())).toEqual({ allowed: true });
+  });
+
+  it("blocks directories outside a git worktree", () => {
+    expect(shouldAutoIndexProject("/tmp")).toMatchObject({ allowed: false });
   });
 });

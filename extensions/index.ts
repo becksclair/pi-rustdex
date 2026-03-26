@@ -1,6 +1,9 @@
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { Type } from "@mariozechner/pi-ai";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { createInterface } from "node:readline";
 
 /**
@@ -54,6 +57,48 @@ function isRustDexAvailable(): boolean {
 /** Apply orange truecolor to text for status bar */
 function orange(text: string): string {
   return `\x1b[38;2;255;165;0m${text}\x1b[0m`;
+}
+
+function isGitWorkTree(projectPath: string): boolean {
+  const result = spawnSync("git", ["rev-parse", "--is-inside-work-tree"], {
+    encoding: "utf-8",
+    cwd: projectPath,
+  });
+
+  return result.status === 0 && result.stdout.trim() === "true";
+}
+
+export function shouldAutoIndexProject(projectPath: string): { allowed: boolean; reason?: string } {
+  let resolvedPath: string;
+  try {
+    resolvedPath = fs.realpathSync(projectPath);
+  } catch {
+    resolvedPath = path.resolve(projectPath);
+  }
+
+  const homeDir = path.resolve(os.homedir());
+  const blockedPaths = new Set([
+    homeDir,
+    path.join(homeDir, ".config"),
+    path.join(homeDir, ".cache"),
+    path.join(homeDir, ".local"),
+  ]);
+
+  if (blockedPaths.has(resolvedPath)) {
+    return {
+      allowed: false,
+      reason: `Skipping RustDex auto-index for protected directory: ${resolvedPath}`,
+    };
+  }
+
+  if (!isGitWorkTree(resolvedPath)) {
+    return {
+      allowed: false,
+      reason: `Skipping RustDex auto-index outside a Git worktree: ${resolvedPath}`,
+    };
+  }
+
+  return { allowed: true };
 }
 
 const STATUS_KEY = "pi-rustdex";
@@ -226,6 +271,13 @@ export default function (pi: ExtensionAPI) {
     clearReadyStatusTimeout();
     killProcess(watchProcess);
     watchProcess = null;
+
+    const autoIndexDecision = shouldAutoIndexProject(projectPath);
+    if (!autoIndexDecision.allowed) {
+      setNotReadyStatus(ctx);
+      ctx.ui.notify(autoIndexDecision.reason!, "info");
+      return;
+    }
 
     // Show initial indexing status
     setAnalyzingStatus(ctx);
